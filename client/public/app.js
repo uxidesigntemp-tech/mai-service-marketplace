@@ -117,6 +117,7 @@ const fetchAPI = async (endpoint, options = {}) => {
     const token = localStorage.getItem('mai_token') || 'demo-token-usr-1';
     const headers = {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
       ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       ...(options.headers || {})
     };
@@ -130,10 +131,20 @@ const fetchAPI = async (endpoint, options = {}) => {
       console.warn(`[API] 401 Unauthorized on ${endpoint}`);
     }
 
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      // Returned HTML or non-JSON (e.g. Netlify static redirect /* /index.html 200)
+      return { ok: false, status: res.status, data: null, error: 'Expected JSON, got ' + contentType };
+    }
+
     const data = await res.json().catch(() => null);
+    if (data === null) {
+      return { ok: false, status: res.status, data: null, error: 'Malformed JSON' };
+    }
+
     return { ok: res.ok, status: res.status, data };
   } catch (err) {
-    console.error(`[API ERROR] ${endpoint}:`, err);
+    console.warn(`[API NOTICE] ${endpoint}:`, err.message);
     return { ok: false, status: 500, data: null, error: err.message };
   }
 };
@@ -401,8 +412,12 @@ function HomePage({
     onNavigate('services', { search: heroSearch });
   };
 
-  const featuredPros = professionals.slice(0, 3);
-  const featuredServices = services.slice(0, 4);
+  const safePros = professionals || [];
+  const safeServices = services || [];
+  const safeCategories = categories || [];
+
+  const featuredPros = safePros.slice(0, 3);
+  const featuredServices = safeServices.slice(0, 4);
 
   return (
     <div className="space-y-16 pb-20">
@@ -477,7 +492,7 @@ function HomePage({
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map(cat => (
+          {safeCategories.map(cat => (
             <div
               key={cat.id}
               onClick={() => onSelectCategory(cat)}
@@ -2345,10 +2360,10 @@ function App() {
 
   // Load Initial Public Marketplace Data
   useEffect(() => {
-    fetchAPI('/categories').then(r => r.ok && setCategories(r.data));
-    fetchAPI('/subcategories').then(r => r.ok && setSubcategories(r.data));
-    fetchAPI('/services').then(r => r.ok && setServices(r.data));
-    fetchAPI('/professionals').then(r => r.ok && setProfessionals(r.data));
+    fetchAPI('/categories').then(r => r.ok && Array.isArray(r.data) && setCategories(r.data));
+    fetchAPI('/subcategories').then(r => r.ok && Array.isArray(r.data) && setSubcategories(r.data));
+    fetchAPI('/services').then(r => r.ok && Array.isArray(r.data) && setServices(r.data));
+    fetchAPI('/professionals').then(r => r.ok && Array.isArray(r.data) && setProfessionals(r.data));
   }, []);
 
   // Check Current Auth Session
@@ -2373,20 +2388,20 @@ function App() {
 
   // Load User Data when authenticated
   const loadUserData = () => {
-    fetchAPI('/bookings').then(r => r.ok && setBookings(r.data));
-    fetchAPI('/payments').then(r => r.ok && setPayments(r.data));
-    fetchAPI('/saved').then(r => r.ok && setSavedItems(r.data));
-    fetchAPI('/addresses').then(r => r.ok && setAddresses(r.data));
-    fetchAPI('/notifications').then(r => r.ok && setNotifications(r.data.notifications || []));
+    fetchAPI('/bookings').then(r => r.ok && Array.isArray(r.data) && setBookings(r.data));
+    fetchAPI('/payments').then(r => r.ok && Array.isArray(r.data) && setPayments(r.data));
+    fetchAPI('/saved').then(r => r.ok && Array.isArray(r.data) && setSavedItems(r.data));
+    fetchAPI('/addresses').then(r => r.ok && Array.isArray(r.data) && setAddresses(r.data));
+    fetchAPI('/notifications').then(r => r.ok && Array.isArray(r.data?.notifications) && setNotifications(r.data.notifications));
     fetchAPI('/messages/conversations').then(r => {
-      if (r.ok && r.data) {
+      if (r.ok && Array.isArray(r.data)) {
         setConversations(r.data);
         if (r.data.length > 0 && !activeConvId) {
           setActiveConvId(r.data[0].id);
         }
       }
     });
-    fetchAPI('/support/tickets').then(r => r.ok && setTickets(r.data));
+    fetchAPI('/support/tickets').then(r => r.ok && Array.isArray(r.data) && setTickets(r.data));
   };
 
   useEffect(() => {
@@ -2903,9 +2918,46 @@ function App() {
   );
 }
 
+// =========================================================================
+// ERROR BOUNDARY & ROOT MOUNT
+// =========================================================================
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error('MAI Service Caught Error:', error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5] p-6 text-center">
+          <div className="max-w-md bg-white p-8 rounded-2xl border border-[#EFECE6] shadow-sm">
+            <h2 className="text-xl font-bold text-[#1E130F]">Something went wrong</h2>
+            <p className="text-xs text-gray-500 mt-2">The application encountered an unexpected error. Please refresh.</p>
+            <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-[#DE5426] text-white rounded-xl text-xs font-bold">
+              Refresh Application
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // Render Application
 const rootElement = document.getElementById('root');
 if (rootElement) {
   const root = ReactDOM.createRoot(rootElement);
-  root.render(<App />);
+  root.render(
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  );
 }

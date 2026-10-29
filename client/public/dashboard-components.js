@@ -217,7 +217,7 @@ function DashboardHeader({
   const [searchInput, setSearchInput] = useState('');
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = (notifications || []).filter(n => !n.isRead).length;
 
   const viewLabels = {
     'dashboard': 'Dashboard Home',
@@ -326,7 +326,7 @@ function DashboardHeader({
                     No new notifications
                   </div>
                 ) : (
-                  notifications.slice(0, 5).map(n => (
+                  (notifications || []).slice(0, 5).map(n => (
                     <div 
                       key={n.id} 
                       onClick={() => { setNotifDropdownOpen(false); onNavigate('notifications'); }}
@@ -468,15 +468,18 @@ function ClientDashboardHome({
   onSelectPro,
   onBookService 
 }) {
-  const upcomingBookings = bookings.filter(b => b.bookingStatus === 'CONFIRMED' || b.bookingStatus === 'PENDING');
-  const activeBookings = bookings.filter(b => b.bookingStatus === 'IN_PROGRESS');
-  const completedBookings = bookings.filter(b => b.bookingStatus === 'COMPLETED');
+  const safeBookings = bookings || [];
+  const safePros = professionals || [];
+
+  const upcomingBookings = safeBookings.filter(b => b.bookingStatus === 'CONFIRMED' || b.bookingStatus === 'PENDING');
+  const activeBookings = safeBookings.filter(b => b.bookingStatus === 'IN_PROGRESS');
+  const completedBookings = safeBookings.filter(b => b.bookingStatus === 'COMPLETED');
   
-  const totalSpent = bookings
+  const totalSpent = safeBookings
     .filter(b => b.paymentStatus === 'PAID')
     .reduce((sum, b) => sum + (parseFloat(b.totalAmount) || 0), 0);
 
-  const featuredPros = professionals.slice(0, 3);
+  const featuredPros = safePros.slice(0, 3);
 
   useEffect(() => {
     if (window.lucide) window.lucide.createIcons();
@@ -607,7 +610,7 @@ function ClientDashboardHome({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#EFECE6]">
-                {bookings.slice(0, 4).map(b => (
+                {safeBookings.slice(0, 4).map(b => (
                   <tr key={b.id} className="hover:bg-[#FAF8F5]/80 transition-colors">
                     <td className="py-3.5 px-4 font-mono font-bold text-[#1E130F]">
                       {b.bookingReference}
@@ -763,6 +766,8 @@ function CategoriesPage({
   onSelectCategory, 
   onNavigate 
 }) {
+  const safeCategories = categories || [];
+
   useEffect(() => {
     if (window.lucide) window.lucide.createIcons();
   }, [categories]);
@@ -778,7 +783,7 @@ function CategoriesPage({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categories.map(cat => (
+        {safeCategories.map(cat => (
           <div 
             key={cat.id}
             onClick={() => onSelectCategory(cat)}
@@ -831,11 +836,14 @@ function CategoryDetailPage({
   onSelectService, 
   onBack 
 }) {
-  const [activeSubcatId, setActiveSubcatId] = useState(subcategories[0]?.id || null);
+  const safeSubcats = subcategories || [];
+  const safeServices = services || [];
+
+  const [activeSubcatId, setActiveSubcatId] = useState(safeSubcats[0]?.id || null);
 
   useEffect(() => {
-    if (subcategories.length > 0 && !activeSubcatId) {
-      setActiveSubcatId(subcategories[0].id);
+    if (safeSubcats.length > 0 && !activeSubcatId) {
+      setActiveSubcatId(safeSubcats[0].id);
     }
   }, [subcategories]);
 
@@ -843,8 +851,8 @@ function CategoryDetailPage({
     if (window.lucide) window.lucide.createIcons();
   }, [category, subcategories, activeSubcatId]);
 
-  const activeSubcat = subcategories.find(s => s.id === activeSubcatId) || subcategories[0];
-  const filteredServices = services.filter(s => 
+  const activeSubcat = safeSubcats.find(s => s.id === activeSubcatId) || safeSubcats[0];
+  const filteredServices = safeServices.filter(s => 
     !activeSubcatId || s.subcategoryId === activeSubcatId || s.subcategoryName === (activeSubcat ? activeSubcat.name : '')
   );
 
@@ -1006,7 +1014,7 @@ function ServiceListingPage({
   }, [services, selectedCategory, pricingModelFilter, sortBy]);
 
   const filtered = useMemo(() => {
-    return services.filter(s => {
+    return (services || []).filter(s => {
       // Search
       const matchSearch = !searchTerm || 
         s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -1205,7 +1213,7 @@ function ProfessionalsPage({
   }, [professionals, selectedCategory]);
 
   const filtered = useMemo(() => {
-    return professionals.filter(p => {
+    return (professionals || []).filter(p => {
       const matchSearch = !searchTerm || 
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (p.title && p.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -1747,7 +1755,7 @@ function PaymentsPage({
     if (window.lucide) window.lucide.createIcons();
   }, [payments]);
 
-  const totalPaid = payments
+  const totalPaid = (payments || [])
     .filter(p => p.status === 'PAID')
     .reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
 
@@ -1854,13 +1862,14 @@ function SavedProfilesPage({
     if (window.lucide) window.lucide.createIcons();
   }, [savedItems, activeTab]);
 
-  const servicesSaved = savedItems.filter(s => s.itemType === 'service');
-  const prosSaved = savedItems.filter(s => s.itemType === 'professional');
+  const safeSaved = savedItems || [];
+  const servicesSaved = safeSaved.filter(s => s.itemType === 'service');
+  const prosSaved = safeSaved.filter(s => s.itemType === 'professional');
 
   const displayed = useMemo(() => {
     if (activeTab === 'services') return servicesSaved;
     if (activeTab === 'pros') return prosSaved;
-    return savedItems;
+    return safeSaved;
   }, [savedItems, activeTab]);
 
   return (

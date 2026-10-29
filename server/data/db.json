@@ -1,6 +1,27 @@
 {
   "users": [
     {
+      "id": "usr-1793269334481",
+      "name": "New Test Customer",
+      "email": "test.user.1793269334449@example.com",
+      "passwordHash": "3ad6723ea7b0b96956baf0401830dcb363b8c163143bd0ab385e45c6f24eb95db5485958e391a3608ce7831009bbcdca03632f4a67e9a36b95a2a645ae48d632",
+      "salt": "8033c82ea06907838811e39f6dcc81ef",
+      "phone": "+44 7700 900999",
+      "role": "customer",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "location": "United Kingdom",
+      "joinedDate": "October 2026",
+      "bio": "MAI Service Customer / Project Owner.",
+      "preferences": {
+        "emailNotifications": true,
+        "bookingUpdates": true,
+        "messageNotifications": true,
+        "promotionalOffers": false,
+        "profileVisibility": "Public",
+        "communicationChannel": "In-App & Email"
+      }
+    },
+    {
       "id": "usr-1793265784375",
       "name": "New Test Customer",
       "email": "test.user.1793265784343@example.com",
@@ -1181,6 +1202,20 @@
   ],
   "addresses": [
     {
+      "id": "addr-1793269334598",
+      "userId": "usr-1",
+      "title": "New Project Site",
+      "streetAddress": "100 King Street",
+      "apartment": "",
+      "city": "London",
+      "state": "Greater London",
+      "postalCode": "W6 0QA",
+      "country": "United Kingdom",
+      "isDefault": false,
+      "instructions": "",
+      "createdAt": "2026-10-29T10:22:14.598Z"
+    },
+    {
       "id": "addr-1793265784434",
       "userId": "usr-1",
       "title": "New Project Site",
@@ -1249,6 +1284,37 @@
     }
   ],
   "bookings": [
+    {
+      "id": "bk-1793269334581",
+      "bookingReference": "MAI-BK-20073",
+      "customerId": "usr-1793269334481",
+      "customerName": "New Test Customer",
+      "customerEmail": "test.user.1793269334449@example.com",
+      "serviceId": "srv-pvc-door",
+      "serviceTitle": "PVC Door Installation",
+      "serviceCategory": "Carpenter",
+      "professionalId": "pro-10",
+      "professionalName": "Thomas Jenkins",
+      "professionalAvatar": "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=150&auto=format&fit=crop&q=80",
+      "serviceDate": "2026-11-15",
+      "timeSlot": "10:00 - 12:00",
+      "durationHours": 3,
+      "quantity": 1,
+      "pricingModel": "hourly",
+      "unitPrice": 100,
+      "subtotal": 300,
+      "serviceFee": 15,
+      "discount": 0,
+      "totalAmount": 315,
+      "bookingStatus": "CONFIRMED",
+      "paymentStatus": "PAID",
+      "addressId": null,
+      "addressSnapshot": null,
+      "workDescription": "Front door replacement test",
+      "additionalRequirements": "",
+      "createdAt": "2026-10-29T10:22:14.581Z",
+      "updatedAt": "2026-10-29T10:22:14.590Z"
+    },
     {
       "id": "bk-1793265784422",
       "bookingReference": "MAI-BK-65145",
@@ -1484,6 +1550,22 @@
     }
   ],
   "payments": [
+    {
+      "id": "pay-1793269334587",
+      "paymentReference": "MAI-PAY-24523",
+      "bookingId": "bk-1793269334581",
+      "bookingReference": "MAI-BK-20073",
+      "userId": "usr-1793269334481",
+      "serviceName": "PVC Door Installation",
+      "professionalName": "Thomas Jenkins",
+      "amount": 315,
+      "currency": "GBP",
+      "paymentMethod": "Card (Visa ending 4242)",
+      "status": "PAID",
+      "transactionId": "txn_mai_1793269334587",
+      "receiptUrl": "/receipts/MAI-PAY-24523.pdf",
+      "createdAt": "2026-10-29T10:22:14.587Z"
+    },
     {
       "id": "pay-1793265784427",
       "paymentReference": "MAI-PAY-35466",
@@ -1724,6 +1806,28 @@
   ],
   "notifications": [
     {
+      "id": "notif-1793269334592",
+      "userId": "usr-1793269334481",
+      "title": "Payment Successful",
+      "message": "Payment of £315.00 received for PVC Door Installation (MAI-BK-20073).",
+      "type": "PAYMENT_RECEIVED",
+      "relatedBookingId": "bk-1793269334581",
+      "relatedBookingRef": "MAI-BK-20073",
+      "isRead": false,
+      "createdAt": "2026-10-29T10:22:14.592Z"
+    },
+    {
+      "id": "notif-1793269334583",
+      "userId": "usr-1793269334481",
+      "title": "Booking Request Submitted",
+      "message": "Your booking for PVC Door Installation (MAI-BK-20073) has been created and is pending confirmation.",
+      "type": "BOOKING_CREATED",
+      "relatedBookingId": "bk-1793269334581",
+      "relatedBookingRef": "MAI-BK-20073",
+      "isRead": false,
+      "createdAt": "2026-10-29T10:22:14.583Z"
+    },
+    {
       "id": "notif-1793265784429",
       "userId": "usr-1793265784375",
       "title": "Payment Successful",
@@ -1823,6 +1927,25 @@
     }
   ],
   "supportTickets": [
+    {
+      "id": "tck-1793269334615",
+      "ticketReference": "MAI-TCK-14930",
+      "userId": "usr-1",
+      "subject": "Test Inquiry",
+      "category": "General Support",
+      "message": "Testing support persistence",
+      "status": "OPEN",
+      "priority": "MEDIUM",
+      "responses": [
+        {
+          "sender": "MAI Support System",
+          "message": "Thank you for reaching out to MAI Support. An agent has been assigned to ticket MAI-TCK-14930 and will review your inquiry shortly.",
+          "createdAt": "2026-10-29T10:22:14.615Z"
+        }
+      ],
+      "createdAt": "2026-10-29T10:22:14.615Z",
+      "updatedAt": "2026-10-29T10:22:14.615Z"
+    },
     {
       "id": "tck-1793265784445",
       "ticketReference": "MAI-TCK-15261",
