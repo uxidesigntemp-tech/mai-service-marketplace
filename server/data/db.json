@@ -1,11 +1,11 @@
 {
   "users": [
     {
-      "id": "usr-1793263832198",
+      "id": "usr-1793265784375",
       "name": "New Test Customer",
-      "email": "test.user.1793263832172@example.com",
-      "passwordHash": "a7331dd5a0faf3ca5abf49b841df3999aacb1aa83da7c2e285f9833c9838165c6940f1ca8374d8e9bc92a76bc63746ec065feeab6a969fba9c2f7a84d41befc0",
-      "salt": "c6439aabba4efff47e848277640a3d92",
+      "email": "test.user.1793265784343@example.com",
+      "passwordHash": "90ca54432f351561b8682e4735d13b5403e3e52ee03c2c0f786ef64e71aeba588788d69d7c75daa8a37fd79d9a7be0e6d645cd4cd6d8522f93be8d015f69ee51",
+      "salt": "e79c2c16996c43f463a0dfce020a4042",
       "phone": "+44 7700 900999",
       "role": "customer",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
@@ -1181,7 +1181,7 @@
   ],
   "addresses": [
     {
-      "id": "addr-1793263832256",
+      "id": "addr-1793265784434",
       "userId": "usr-1",
       "title": "New Project Site",
       "streetAddress": "100 King Street",
@@ -1192,7 +1192,7 @@
       "country": "United Kingdom",
       "isDefault": false,
       "instructions": "",
-      "createdAt": "2026-10-29T08:50:32.256Z"
+      "createdAt": "2026-10-29T09:23:04.434Z"
     },
     {
       "id": "addr-1793259015863",
@@ -1250,11 +1250,11 @@
   ],
   "bookings": [
     {
-      "id": "bk-1793263832243",
-      "bookingReference": "MAI-BK-74725",
-      "customerId": "usr-1793263832198",
+      "id": "bk-1793265784422",
+      "bookingReference": "MAI-BK-65145",
+      "customerId": "usr-1793265784375",
       "customerName": "New Test Customer",
-      "customerEmail": "test.user.1793263832172@example.com",
+      "customerEmail": "test.user.1793265784343@example.com",
       "serviceId": "srv-pvc-door",
       "serviceTitle": "PVC Door Installation",
       "serviceCategory": "Carpenter",
@@ -1277,8 +1277,45 @@
       "addressSnapshot": null,
       "workDescription": "Front door replacement test",
       "additionalRequirements": "",
-      "createdAt": "2026-10-29T08:50:32.243Z",
-      "updatedAt": "2026-10-29T08:50:32.249Z"
+      "createdAt": "2026-10-29T09:23:04.422Z",
+      "updatedAt": "2026-10-29T09:23:04.428Z"
+    },
+    {
+      "id": "bk-1793264201682",
+      "bookingReference": "MAI-BK-85749",
+      "customerId": "usr-1",
+      "customerName": "Alex Morgan",
+      "customerEmail": "alex@example.com",
+      "serviceId": "srv-interior-painting",
+      "serviceTitle": "Full Room Wall & Ceiling Emulsion Painting",
+      "serviceCategory": "Painter",
+      "professionalId": "pro-12",
+      "professionalName": "Liam O'Connor",
+      "professionalAvatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
+      "serviceDate": "2026-11-05",
+      "timeSlot": "10:00 - 12:00",
+      "durationHours": 4,
+      "quantity": 1,
+      "pricingModel": "hourly",
+      "unitPrice": 50,
+      "subtotal": 200,
+      "serviceFee": 10,
+      "discount": 0,
+      "totalAmount": 210,
+      "bookingStatus": "CONFIRMED",
+      "paymentStatus": "PAID",
+      "addressId": "addr-1793259015863",
+      "addressSnapshot": {
+        "title": "New Project Site",
+        "streetAddress": "100 King Street",
+        "apartment": "",
+        "city": "London",
+        "postalCode": "W6 0QA"
+      },
+      "workDescription": "",
+      "additionalRequirements": "",
+      "createdAt": "2026-10-29T08:56:41.682Z",
+      "updatedAt": "2026-10-29T08:56:42.979Z"
     },
     {
       "id": "bk-1793259015851",
@@ -1448,20 +1485,36 @@
   ],
   "payments": [
     {
-      "id": "pay-1793263832248",
-      "paymentReference": "MAI-PAY-65005",
-      "bookingId": "bk-1793263832243",
-      "bookingReference": "MAI-BK-74725",
-      "userId": "usr-1793263832198",
+      "id": "pay-1793265784427",
+      "paymentReference": "MAI-PAY-35466",
+      "bookingId": "bk-1793265784422",
+      "bookingReference": "MAI-BK-65145",
+      "userId": "usr-1793265784375",
       "serviceName": "PVC Door Installation",
       "professionalName": "Thomas Jenkins",
       "amount": 315,
       "currency": "GBP",
       "paymentMethod": "Card (Visa ending 4242)",
       "status": "PAID",
-      "transactionId": "txn_mai_1793263832248",
-      "receiptUrl": "/receipts/MAI-PAY-65005.pdf",
-      "createdAt": "2026-10-29T08:50:32.248Z"
+      "transactionId": "txn_mai_1793265784427",
+      "receiptUrl": "/receipts/MAI-PAY-35466.pdf",
+      "createdAt": "2026-10-29T09:23:04.427Z"
+    },
+    {
+      "id": "pay-1793264202978",
+      "paymentReference": "MAI-PAY-83883",
+      "bookingId": "bk-1793264201682",
+      "bookingReference": "MAI-BK-85749",
+      "userId": "usr-1",
+      "serviceName": "Full Room Wall & Ceiling Emulsion Painting",
+      "professionalName": "Liam O'Connor",
+      "amount": 210,
+      "currency": "GBP",
+      "paymentMethod": "Card (Visa ending 4242)",
+      "status": "PAID",
+      "transactionId": "txn_mai_1793264202978",
+      "receiptUrl": "/receipts/MAI-PAY-83883.pdf",
+      "createdAt": "2026-10-29T08:56:42.978Z"
     },
     {
       "id": "pay-1793259015855",
@@ -1671,26 +1724,48 @@
   ],
   "notifications": [
     {
-      "id": "notif-1793263832250",
-      "userId": "usr-1793263832198",
+      "id": "notif-1793265784429",
+      "userId": "usr-1793265784375",
       "title": "Payment Successful",
-      "message": "Payment of £315.00 received for PVC Door Installation (MAI-BK-74725).",
+      "message": "Payment of £315.00 received for PVC Door Installation (MAI-BK-65145).",
       "type": "PAYMENT_RECEIVED",
-      "relatedBookingId": "bk-1793263832243",
-      "relatedBookingRef": "MAI-BK-74725",
+      "relatedBookingId": "bk-1793265784422",
+      "relatedBookingRef": "MAI-BK-65145",
       "isRead": false,
-      "createdAt": "2026-10-29T08:50:32.250Z"
+      "createdAt": "2026-10-29T09:23:04.429Z"
     },
     {
-      "id": "notif-1793263832244",
-      "userId": "usr-1793263832198",
+      "id": "notif-1793265784423",
+      "userId": "usr-1793265784375",
       "title": "Booking Request Submitted",
-      "message": "Your booking for PVC Door Installation (MAI-BK-74725) has been created and is pending confirmation.",
+      "message": "Your booking for PVC Door Installation (MAI-BK-65145) has been created and is pending confirmation.",
       "type": "BOOKING_CREATED",
-      "relatedBookingId": "bk-1793263832243",
-      "relatedBookingRef": "MAI-BK-74725",
+      "relatedBookingId": "bk-1793265784422",
+      "relatedBookingRef": "MAI-BK-65145",
       "isRead": false,
-      "createdAt": "2026-10-29T08:50:32.244Z"
+      "createdAt": "2026-10-29T09:23:04.423Z"
+    },
+    {
+      "id": "notif-1793264202981",
+      "userId": "usr-1",
+      "title": "Payment Successful",
+      "message": "Payment of £210.00 received for Full Room Wall & Ceiling Emulsion Painting (MAI-BK-85749).",
+      "type": "PAYMENT_RECEIVED",
+      "relatedBookingId": "bk-1793264201682",
+      "relatedBookingRef": "MAI-BK-85749",
+      "isRead": false,
+      "createdAt": "2026-10-29T08:56:42.981Z"
+    },
+    {
+      "id": "notif-1793264201684",
+      "userId": "usr-1",
+      "title": "Booking Request Submitted",
+      "message": "Your booking for Full Room Wall & Ceiling Emulsion Painting (MAI-BK-85749) has been created and is pending confirmation.",
+      "type": "BOOKING_CREATED",
+      "relatedBookingId": "bk-1793264201682",
+      "relatedBookingRef": "MAI-BK-85749",
+      "isRead": false,
+      "createdAt": "2026-10-29T08:56:41.684Z"
     },
     {
       "id": "notif-1793259015857",
@@ -1749,8 +1824,8 @@
   ],
   "supportTickets": [
     {
-      "id": "tck-1793263832265",
-      "ticketReference": "MAI-TCK-51010",
+      "id": "tck-1793265784445",
+      "ticketReference": "MAI-TCK-15261",
       "userId": "usr-1",
       "subject": "Test Inquiry",
       "category": "General Support",
@@ -1760,12 +1835,12 @@
       "responses": [
         {
           "sender": "MAI Support System",
-          "message": "Thank you for reaching out to MAI Support. An agent has been assigned to ticket MAI-TCK-51010 and will review your inquiry shortly.",
-          "createdAt": "2026-10-29T08:50:32.265Z"
+          "message": "Thank you for reaching out to MAI Support. An agent has been assigned to ticket MAI-TCK-15261 and will review your inquiry shortly.",
+          "createdAt": "2026-10-29T09:23:04.445Z"
         }
       ],
-      "createdAt": "2026-10-29T08:50:32.265Z",
-      "updatedAt": "2026-10-29T08:50:32.265Z"
+      "createdAt": "2026-10-29T09:23:04.445Z",
+      "updatedAt": "2026-10-29T09:23:04.445Z"
     },
     {
       "id": "tck-1793259015874",

@@ -56,9 +56,28 @@ if (!fs.existsSync(distAssetsDir)) {
   console.log('[EMIT] dist/assets/ (directory created)');
 }
 
-// 4. Verify Critical Production Files in dist/
+// Ensure SPA fallback _redirects exists in dist/
+const redirectsFile = path.join(DIST_DIR, '_redirects');
+if (!fs.existsSync(redirectsFile)) {
+  fs.writeFileSync(redirectsFile, '/* /index.html 200\n', 'utf8');
+  console.log('[EMIT] dist/_redirects (created SPA fallback)');
+}
+
+// 4. Inject Dynamic Cache-Buster Build ID into dist/index.html
+const buildHash = 'v' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 7);
+const indexPath = path.join(DIST_DIR, 'index.html');
+if (fs.existsSync(indexPath)) {
+  let htmlContent = fs.readFileSync(indexPath, 'utf8');
+  htmlContent = htmlContent.replace(/dashboard-components\.js(\?v=[^"']*)?/g, `dashboard-components.js?v=${buildHash}`);
+  htmlContent = htmlContent.replace(/app\.js(\?v=[^"']*)?/g, `app.js?v=${buildHash}`);
+  htmlContent = htmlContent.replace(/content="[^"]*"\s+name="mai-build-version"/g, `name="mai-build-version" content="${buildHash}"`);
+  fs.writeFileSync(indexPath, htmlContent, 'utf8');
+  console.log(`\n[CACHE-BUST] Injected unique cache buster into dist/index.html: ?v=${buildHash}`);
+}
+
+// 5. Verify Critical Production Files in dist/
 console.log('\n[VERIFY] Validating production build output...');
-const criticalFiles = ['index.html', 'app.js', 'dashboard-components.js'];
+const criticalFiles = ['index.html', 'app.js', 'dashboard-components.js', '_redirects'];
 let buildOk = true;
 
 criticalFiles.forEach(file => {
@@ -72,7 +91,7 @@ criticalFiles.forEach(file => {
   }
 });
 
-// 5. Verify All 31 Required React Components in dist/
+// 6. Verify All 31 Required React Components in dist/
 const code1 = fs.readFileSync(path.join(DIST_DIR, 'dashboard-components.js'), 'utf8');
 const code2 = fs.readFileSync(path.join(DIST_DIR, 'app.js'), 'utf8');
 const bundleCode = code1 + '\n' + code2;
@@ -102,12 +121,13 @@ if (componentsOk) {
   buildOk = false;
 }
 
-// 6. Final Result
+// 7. Final Result
 if (buildOk) {
   console.log('\n==================================================');
   console.log('✓ BUILD SUCCESSFUL!');
   console.log(`✓ Production output ready at: ${DIST_DIR}`);
   console.log(`✓ Entry point: ${path.join(DIST_DIR, 'index.html')}`);
+  console.log(`✓ SPA Redirects: ${path.join(DIST_DIR, '_redirects')}`);
   console.log('==================================================');
   process.exit(0);
 } else {

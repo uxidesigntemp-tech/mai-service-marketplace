@@ -71,8 +71,8 @@ function Sidebar({
 }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
-    { id: 'professionals', label: 'Professionals', icon: 'users' },
-    { id: 'services', label: 'Services', icon: 'wrench' },
+    { id: 'dashboard-professionals', alias: 'professionals', label: 'Professionals', icon: 'users' },
+    { id: 'dashboard-services', alias: 'services', label: 'Services', icon: 'wrench' },
     { id: 'my-bookings', label: 'My Bookings', icon: 'calendar' },
     { id: 'payments', label: 'Payments', icon: 'credit-card' },
     { id: 'messages', label: 'Messages', icon: 'message-square' },
@@ -83,6 +83,10 @@ function Sidebar({
     { id: 'settings', label: 'Settings', icon: 'settings' },
     { id: 'help', label: 'Help & Support', icon: 'help-circle' }
   ];
+
+  const isItemActive = (item) => {
+    return currentView === item.id || (item.alias && currentView === item.alias);
+  };
 
   useEffect(() => {
     if (window.lucide) window.lucide.createIcons();
@@ -132,7 +136,7 @@ function Sidebar({
         {/* Navigation Links */}
         <nav className="space-y-1">
           {navItems.map(item => {
-            const isActive = currentView === item.id;
+            const isActive = isItemActive(item);
             return (
               <button
                 key={item.id}
@@ -217,6 +221,8 @@ function DashboardHeader({
 
   const viewLabels = {
     'dashboard': 'Dashboard Home',
+    'dashboard-professionals': 'Explore Professionals',
+    'dashboard-services': 'Service Catalogue',
     'professionals': 'Explore Professionals',
     'services': 'Service Catalogue',
     'my-bookings': 'My Bookings',

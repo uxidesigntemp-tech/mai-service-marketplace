@@ -6,7 +6,111 @@ const { useState, useEffect, useMemo, useRef } = React;
 // API CLIENT WITH AUTH HEADERS & PERSISTENCE
 // =========================================================================
 
-const API_BASE = '/api';
+// Dynamically resolve API base across localhost, reverse proxy, or remote backend
+const getApiBase = () => {
+  if (typeof window !== 'undefined') {
+    if (window.__MAI_API_BASE__) return window.__MAI_API_BASE__;
+    const metaTag = document.querySelector('meta[name="mai-api-base"]');
+    if (metaTag && metaTag.content && !metaTag.content.startsWith('%')) {
+      return metaTag.content.replace(/\/$/, '');
+    }
+  }
+  return '/api';
+};
+
+const API_BASE = getApiBase();
+
+// Client-Side SPA Route Definitions & Path Mappings
+const ROUTE_MAP = {
+  '/': 'home',
+  '/home': 'home',
+  '/categories': 'categories',
+  '/services': 'services',
+  '/professionals': 'professionals',
+  '/how-it-works': 'how-it-works',
+  '/about-us': 'about-us',
+  '/contact-us': 'contact-us',
+  '/help-faq': 'help-faq',
+  '/privacy-policy': 'privacy-policy',
+  '/terms': 'terms',
+  '/dashboard': 'dashboard',
+  '/dashboard/': 'dashboard',
+  '/dashboard/professionals': 'dashboard-professionals',
+  '/dashboard/services': 'dashboard-services',
+  '/dashboard/bookings': 'my-bookings',
+  '/dashboard/my-bookings': 'my-bookings',
+  '/my-bookings': 'my-bookings',
+  '/dashboard/payments': 'payments',
+  '/payments': 'payments',
+  '/dashboard/messages': 'messages',
+  '/messages': 'messages',
+  '/dashboard/saved': 'saved',
+  '/saved': 'saved',
+  '/dashboard/profile': 'profile',
+  '/profile': 'profile',
+  '/dashboard/addresses': 'addresses',
+  '/addresses': 'addresses',
+  '/dashboard/notifications': 'notifications',
+  '/notifications': 'notifications',
+  '/dashboard/settings': 'settings',
+  '/settings': 'settings',
+  '/dashboard/help': 'help',
+  '/help': 'help'
+};
+
+const getPathFromView = (view) => {
+  switch (view) {
+    case 'home': return '/';
+    case 'categories': return '/categories';
+    case 'category-detail': return '/categories';
+    case 'services': return '/services';
+    case 'service-detail': return '/services';
+    case 'professionals': return '/professionals';
+    case 'professional-profile': return '/professionals';
+    case 'how-it-works': return '/how-it-works';
+    case 'about-us': return '/about-us';
+    case 'contact-us': return '/contact-us';
+    case 'help-faq': return '/help-faq';
+    case 'privacy-policy': return '/privacy-policy';
+    case 'terms': return '/terms';
+    case 'dashboard': return '/dashboard';
+    case 'dashboard-professionals': return '/dashboard/professionals';
+    case 'dashboard-services': return '/dashboard/services';
+    case 'my-bookings': return '/dashboard/bookings';
+    case 'payments': return '/dashboard/payments';
+    case 'messages': return '/dashboard/messages';
+    case 'saved': return '/dashboard/saved';
+    case 'profile': return '/dashboard/profile';
+    case 'addresses': return '/dashboard/addresses';
+    case 'notifications': return '/dashboard/notifications';
+    case 'settings': return '/dashboard/settings';
+    case 'help': return '/dashboard/help';
+    default: return '/';
+  }
+};
+
+const getViewFromPath = (path) => {
+  const current = (path || (typeof window !== 'undefined' ? window.location.pathname : '/')).replace(/\/$/, '') || '/';
+  if (ROUTE_MAP[current]) {
+    return ROUTE_MAP[current];
+  }
+  if (current.startsWith('/dashboard/professionals')) return 'dashboard-professionals';
+  if (current.startsWith('/dashboard/services')) return 'dashboard-services';
+  if (current.startsWith('/dashboard/bookings') || current.startsWith('/dashboard/my-bookings')) return 'my-bookings';
+  if (current.startsWith('/dashboard/payments')) return 'payments';
+  if (current.startsWith('/dashboard/messages')) return 'messages';
+  if (current.startsWith('/dashboard/saved')) return 'saved';
+  if (current.startsWith('/dashboard/profile')) return 'profile';
+  if (current.startsWith('/dashboard/addresses')) return 'addresses';
+  if (current.startsWith('/dashboard/notifications')) return 'notifications';
+  if (current.startsWith('/dashboard/settings')) return 'settings';
+  if (current.startsWith('/dashboard/help')) return 'help';
+  if (current.startsWith('/dashboard')) return 'dashboard';
+  if (current.startsWith('/services')) return 'services';
+  if (current.startsWith('/professionals')) return 'professionals';
+  if (current.startsWith('/categories')) return 'categories';
+  return 'home';
+};
 
 const fetchAPI = async (endpoint, options = {}) => {
   try {
@@ -2183,9 +2287,22 @@ function App() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('mai_token'));
 
-  // Navigation & View State
-  const [currentView, setCurrentView] = useState('home');
+  // Navigation & View State (Initialized directly from current URL pathname)
+  const [currentView, setCurrentView] = useState(() => getViewFromPath(typeof window !== 'undefined' ? window.location.pathname : '/'));
   const [viewParams, setViewParams] = useState({});
+
+  // Synchronize browser history and popstate (Back/Forward buttons)
+  useEffect(() => {
+    const handlePopState = (event) => {
+      const view = getViewFromPath(window.location.pathname);
+      setCurrentView(view);
+      if (event.state && event.state.params) {
+        setViewParams(event.state.params);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Marketplace Data State
   const [categories, setCategories] = useState([]);
@@ -2289,10 +2406,30 @@ function App() {
     }
   }, [activeConvId]);
 
-  // Universal Navigation Handler
+  // Universal Navigation Handler with History API Synchronization
   const handleNavigate = (view, params = {}) => {
+    let targetView = view;
+    // If user is inside the dashboard and navigates to professionals or services, keep them in dashboard workspace
+    const isCurrentlyDashboard = [
+      'dashboard', 'dashboard-professionals', 'dashboard-services',
+      'my-bookings', 'payments', 'messages', 
+      'saved', 'profile', 'addresses', 'notifications', 
+      'settings', 'help'
+    ].includes(currentView);
+
+    if (isCurrentlyDashboard && view === 'professionals') {
+      targetView = 'dashboard-professionals';
+    } else if (isCurrentlyDashboard && view === 'services') {
+      targetView = 'dashboard-services';
+    }
+
     setViewParams(params);
-    setCurrentView(view);
+    setCurrentView(targetView);
+
+    const targetPath = getPathFromView(targetView);
+    if (typeof window !== 'undefined' && window.location.pathname !== targetPath) {
+      window.history.pushState({ view: targetView, params }, '', targetPath);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -2426,7 +2563,8 @@ function App() {
 
   // Check if current view is a dashboard view
   const isDashboardView = [
-    'dashboard', 'my-bookings', 'payments', 'messages', 
+    'dashboard', 'dashboard-professionals', 'dashboard-services',
+    'my-bookings', 'payments', 'messages', 
     'saved', 'profile', 'addresses', 'notifications', 
     'settings', 'help'
   ].includes(currentView);
@@ -2465,6 +2603,52 @@ function App() {
               onSelectPro={(p) => { setSelectedPro(p); handleNavigate('professional-profile'); }}
               onBookService={handleStartBooking}
             />
+          )}
+
+          {(currentView === 'dashboard-professionals' || currentView === 'professionals') && (
+            <div className="space-y-6">
+              <div className="bg-white p-6 rounded-2xl border border-[#EFECE6] shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-[#1E130F]">Verified Marketplace Professionals</h2>
+                  <p className="text-xs text-gray-500 mt-1">Browse, filter, and directly book vetted trade specialists from your client workspace.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <i data-lucide="shield-check" className="w-3.5 h-3.5"></i>
+                    All ID & Insurance Vetted
+                  </span>
+                </div>
+              </div>
+              <ProfessionalsPage 
+                professionals={professionals}
+                categories={categories}
+                onSelectPro={(p) => { setSelectedPro(p); handleNavigate('professional-profile'); }}
+                onBookPro={(p, srv) => handleStartBooking(srv || { professionalId: p.id })}
+              />
+            </div>
+          )}
+
+          {(currentView === 'dashboard-services' || currentView === 'services') && (
+            <div className="space-y-6">
+              <div className="bg-white p-6 rounded-2xl border border-[#EFECE6] shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-[#1E130F]">Explore All Marketplace Services</h2>
+                  <p className="text-xs text-gray-500 mt-1">Browse and book flat-rate or hourly home trade services with transparent pricing.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#FDF6F3] text-[#DE5426] border border-[#F7CEBF]">
+                    <i data-lucide="check-circle-2" className="w-3.5 h-3.5"></i>
+                    Upfront Fixed & Hourly Rates
+                  </span>
+                </div>
+              </div>
+              <ServiceListingPage 
+                services={services}
+                categories={categories}
+                onSelectService={(s) => { setSelectedService(s); handleNavigate('service-detail'); }}
+                onBookService={handleStartBooking}
+              />
+            </div>
           )}
 
           {currentView === 'my-bookings' && (

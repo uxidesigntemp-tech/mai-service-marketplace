@@ -22,7 +22,12 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const PUBLIC_DIR = path.join(__dirname, '..', 'client', 'public');
+const DIST_DIR = path.join(__dirname, '..', 'dist');
+const CLIENT_PUBLIC_DIR = path.join(__dirname, '..', 'client', 'public');
+// Prefer compiled production dist if available, otherwise serve client/public
+const PUBLIC_DIR = (fs.existsSync(DIST_DIR) && fs.existsSync(path.join(DIST_DIR, 'index.html')))
+  ? DIST_DIR
+  : CLIENT_PUBLIC_DIR;
 
 // Middlewares
 app.use(cors({
@@ -70,7 +75,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/saved-profiles', savedRoutes);
 
 // Serve static frontend assets
-app.use(express.static(PUBLIC_DIR));
+app.use(express.static(PUBLIC_DIR, { dotfiles: 'allow' }));
 
 // 404 for unhandled API routes
 app.use('/api', notFoundHandler);
@@ -80,7 +85,7 @@ app.use((req, res, next) => {
   if (req.method !== 'GET') return next();
   const indexPath = path.join(PUBLIC_DIR, 'index.html');
   if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
+    res.sendFile(indexPath, { dotfiles: 'allow' });
   } else {
     res.status(404).send('MAI Service frontend not found.');
   }
