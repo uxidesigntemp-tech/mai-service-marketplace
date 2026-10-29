@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAI SERVICE | Find the Right Professional for Any Job</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#DE5426',
+              50: '#FDF6F3',
+              100: '#FBE9E2',
+              200: '#F7CEBF',
+              500: '#DE5426',
+              600: '#C8461C',
+              700: '#A93815',
+              dark: '#261611',
+              charcoal: '#1E130F',
+              navy: '#14223E',
+              cream: '#FAF8F5',
+              cardBg: '#FFFFFF',
+              border: '#EFECE6',
+              muted: '#716B67'
+            },
+            tealHero: '#123338',
+            oliveHero: '#2D3B23'
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    // Safe React-compatible Lucide integration: render SVG inside <i> rather than replacing the <i> DOM node
+    // This prevents "NotFoundError: Failed to execute 'removeChild' on 'Node'" during React unmount/re-render
+    if (window.lucide) {
+      window.lucide.createIcons = function(options) {
+        try {
+          var nameAttr = (options && options.nameAttr) || 'data-lucide';
+          var root = (options && options.root) || document;
+          var elements = root.querySelectorAll('[' + nameAttr + ']');
+          elements.forEach(function(element) {
+            var iconName = element.getAttribute(nameAttr);
+            if (!iconName) return;
+            
+            var camelName = iconName.replace(/-([a-z0-9])/g, function(g) { return g[1].toUpperCase(); });
+            var pascalName = camelName.charAt(0).toUpperCase() + camelName.slice(1);
+            
+            var icon = window.lucide.icons && (window.lucide.icons[pascalName] || window.lucide.icons[iconName] || window.lucide.icons[camelName]);
+            if (icon && typeof icon.toSvg === 'function') {
+              var elementClass = element.getAttribute('class') || '';
+              element.innerHTML = icon.toSvg({ class: elementClass });
+              element.style.display = 'inline-flex';
+              element.style.alignItems = 'center';
+              element.style.justifyContent = 'center';
+              element.style.verticalAlign = 'middle';
+            }
+          });
+        } catch (err) {
+          console.warn('Lucide icon render notice:', err);
+        }
+      };
+    }
+  </script>
+
+  <!-- React 18 & Babel Standalone -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      background-color: #FAF8F5;
+      color: #1E130F;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Custom smooth scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F2EFE9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D0C9C0;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #B5ACA1;
+    }
+
+    /* Subtle hover microinteractions */
+    .card-hover {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px -6px rgba(38, 22, 17, 0.08);
+    }
+
+    /* Star rating */
+    .star-filled {
+      color: #F59E0B;
+      fill: #F59E0B;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#FAF8F5] text-[#1E130F]">
+  <div id="root"></div>
+
+  <!-- Load Dashboard & Main React Application -->
+  <script type="text/babel" src="/dashboard-components.js"></script>
+  <script type="text/babel" src="/app.js"></script>
+</body>
+</html>
